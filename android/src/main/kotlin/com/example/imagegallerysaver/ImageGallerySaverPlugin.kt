@@ -41,19 +41,19 @@ class ImageGallerySaverPlugin(private val registrar: Registrar): MethodCallHandl
 
   }
 
-  private fun generateFile(): File {
+  private fun generateFile(suffix:String): File {
     val storePath =  Environment.getExternalStorageDirectory().absolutePath + File.separator + getApplicationName()
     val appDir = File(storePath)
     if (!appDir.exists()) {
       appDir.mkdir()
     }
-    val fileName = System.currentTimeMillis().toString() + ".png"
+    val fileName = System.currentTimeMillis().toString() + suffix
     return File(appDir, fileName)
   }
 
   private fun saveImageToGallery(bmp: Bitmap): Boolean {
     val context = registrar.activeContext().applicationContext
-    val file = generateFile()
+    val file = generateFile(".png")
     try {
       val fos = FileOutputStream(file)
       val isSuccess = bmp.compress(Bitmap.CompressFormat.PNG, 60, fos)
@@ -72,7 +72,8 @@ class ImageGallerySaverPlugin(private val registrar: Registrar): MethodCallHandl
     val context = registrar.activeContext().applicationContext
     return try {
       val originalFile = File(filePath)
-      val file = generateFile()
+      val suffix = filePath.substring(filePath.lastIndexOf("."), filePath.length)
+      val file = generateFile(suffix)
       originalFile.copyTo(file)
 
       val uri = Uri.fromFile(file)
